@@ -1,0 +1,3 @@
+This MessAdmin plugin computes and displays Objects size...
+
+To install, simply drop MessAdmin-SizeOf.jar next to MessAdmin.jar or in WEB-INF/lib/
