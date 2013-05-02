@@ -17,7 +17,7 @@
 	<parent>
 		<groupId>net.sourceforge.messadmin</groupId>
 		<artifactId>MessAdmin</artifactId>
-		<version>5.3</version>
+		<version>5.4</version>
 	</parent>
 
 	<!-- Dependencies -->
@@ -41,9 +41,4 @@
 	<!-- - - - - - - -  -->
 
 	<packaging>jar</packaging>
-
-	<properties>
-		<maven.compiler.source>1.4</maven.compiler.source>
-		<maven.compiler.target>1.4</maven.compiler.target>
-	</properties>
 </project>
