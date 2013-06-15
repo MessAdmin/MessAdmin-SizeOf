@@ -77,7 +77,7 @@ public class ObjectProfilerTest extends TestCase {
 				"sun.reflect.UnsafeStaticDoubleFieldAccessorImpl", // 1.4+
 				"sun.reflect.UnsafeStaticObjectFieldAccessorImpl" // 1.4+
 			};
-		List classes = new ArrayList(sunProblematicClassesNames.length);
+		List<Class> classes = new ArrayList<Class>(sunProblematicClassesNames.length);
 		for (int i = 0; i < sunProblematicClassesNames.length; ++i) {
 			String className = sunProblematicClassesNames[i];
 			try {
@@ -86,7 +86,7 @@ public class ObjectProfilerTest extends TestCase {
 				//System.out.println(cnfe);
 			}
 		}
-		sunProblematicClasses = (Class[]) classes.toArray(new Class[0]);
+		sunProblematicClasses = classes.toArray(new Class[0]);
 	}
 
 	public static void main(String[] args) {
@@ -96,6 +96,7 @@ public class ObjectProfilerTest extends TestCase {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
@@ -103,6 +104,7 @@ public class ObjectProfilerTest extends TestCase {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}
@@ -140,7 +142,7 @@ public class ObjectProfilerTest extends TestCase {
 
 	public void testSunBuggyJVM() {
 		for (int i = 0; i < sunProblematicClasses.length; ++i) {
-			Class clazz = sunProblematicClasses[i];
+			Class<?> clazz = sunProblematicClasses[i];
 			Object instance = null;
 			try {
 				instance = clazz.newInstance();
