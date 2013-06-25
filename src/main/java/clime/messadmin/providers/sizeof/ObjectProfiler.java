@@ -27,6 +27,8 @@ import java.util.jar.Pack200;
 
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRelation;
+import javax.accessibility.AccessibleRole;
+import javax.accessibility.AccessibleState;
 import javax.management.monitor.MonitorNotification;
 import javax.management.relation.RelationNotification;
 import javax.management.remote.JMXConnectionNotification;
@@ -34,6 +36,7 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.rmi.RMIConnectorServer;
 import javax.naming.Context;
+import javax.print.DocFlavor;
 import javax.security.sasl.Sasl;
 import javax.xml.XMLConstants;
 import javax.xml.datatype.DatatypeConstants;
@@ -481,10 +484,21 @@ public abstract class ObjectProfiler {
 	 * Very incomplete, but better than nothing...
 	 */
 	// See http://docs.oracle.com/javase/7/docs/api/constant-values.html for JDK's String constants
-	// not reported here: java.awt, javax.swing
+	// a bit of help on the html docs: grep -r "public static final&nbsp;<a href=\"" . | uniq
+	// a bit of help from docs: e.g. http://docs.oracle.com/javase/7/docs/api/java/lang/class-use/Float.html
+	@SuppressWarnings("deprecation")
 	private static boolean isSharedFlyweight(Object obj) {
-		if (obj == null || Enum.class.isInstance(obj) || Class.class.isInstance(obj) ||
-				java.nio.charset.CodingErrorAction.class.isInstance(obj) || DatatypeConstants.Field.class.isInstance(obj)) {
+		if (obj == null || Enum.class.isInstance(obj) || Class.class.isInstance(obj) || javax.print.attribute.EnumSyntax.class.isInstance(obj) ||
+				Character.UnicodeBlock.class.isInstance(obj) ||
+				java.nio.ByteOrder.class.isInstance(obj) ||
+				java.nio.channels.FileChannel.MapMode.class.isInstance(obj) ||
+				java.nio.charset.CoderResult.class.isInstance(obj) ||
+				java.nio.charset.CodingErrorAction.class.isInstance(obj) ||
+				java.text.DateFormat.Field.class.isInstance(obj) || java.text.MessageFormat.Field.class.isInstance(obj) || java.text.NumberFormat.Field.class.isInstance(obj) ||
+				javax.management.openmbean.SimpleType.class.isInstance(obj) ||
+				javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag.class.isInstance(obj) ||
+				DatatypeConstants.Field.class.isInstance(obj)
+				) {
 			return true;
 		}
 		if (obj == Boolean.TRUE || obj == Boolean.FALSE) {
@@ -502,7 +516,8 @@ public abstract class ObjectProfiler {
 		if (obj == Collections.EMPTY_SET || obj == Collections.EMPTY_LIST || obj == Collections.EMPTY_MAP) {
 			return true;
 		}
-		if (obj == BigInteger.ZERO || obj == BigInteger.ONE || obj == BigInteger.TEN) {
+		if (obj == BigInteger.ZERO || obj == BigInteger.ONE || obj == BigInteger.TEN
+				|| obj == java.security.spec.RSAKeyGenParameterSpec.F0 || obj == java.security.spec.RSAKeyGenParameterSpec.F4) {
 			return true;
 		}
 		if (obj == BigDecimal.ZERO || obj == BigDecimal.ONE || obj == BigDecimal.TEN) {
@@ -514,36 +529,24 @@ public abstract class ObjectProfiler {
 		if (obj == System.in || obj == System.out || obj == System.err) {
 			return true;
 		}
-		if (obj == java.util.logging.Logger.global) {
+		if (obj == String.CASE_INSENSITIVE_ORDER) {
 			return true;
 		}
 		if (obj == java.net.Proxy.NO_PROXY) {
 			return true;
 		}
-		if (obj == DatatypeConstants.DATETIME
-                || obj == DatatypeConstants.TIME
-                || obj == DatatypeConstants.DATE
-                || obj == DatatypeConstants.GYEARMONTH
-                || obj == DatatypeConstants.GMONTHDAY
-                || obj == DatatypeConstants.GYEAR
-                || obj == DatatypeConstants.GMONTH
-                || obj == DatatypeConstants.GDAY
-                || obj == DatatypeConstants.DURATION
-                || obj == DatatypeConstants.DURATION_DAYTIME
-                || obj == DatatypeConstants.DURATION_YEARMONTH) {
-			return true;
-		}
-		if (obj == String.CASE_INSENSITIVE_ORDER) {
+		if (obj == java.util.logging.Logger.global || obj == java.util.logging.Level.OFF || obj == java.util.logging.Level.SEVERE || obj == java.util.logging.Level.WARNING || obj == java.util.logging.Level.INFO || obj == java.util.logging.Level.CONFIG || obj == java.util.logging.Level.FINE || obj == java.util.logging.Level.FINER || obj == java.util.logging.Level.FINEST || obj == java.util.logging.Level.ALL) {
 			return true;
 		}
 		if (obj == java.beans.DesignMode.PROPERTYNAME ||
 				obj == ManagementFactory.CLASS_LOADING_MXBEAN_NAME || obj == ManagementFactory.COMPILATION_MXBEAN_NAME || obj == ManagementFactory.GARBAGE_COLLECTOR_MXBEAN_DOMAIN_TYPE || obj == ManagementFactory.MEMORY_MANAGER_MXBEAN_DOMAIN_TYPE || obj == ManagementFactory.MEMORY_MXBEAN_NAME || obj == ManagementFactory.MEMORY_POOL_MXBEAN_DOMAIN_TYPE || obj == ManagementFactory.OPERATING_SYSTEM_MXBEAN_NAME || obj == ManagementFactory.RUNTIME_MXBEAN_NAME || obj == ManagementFactory.THREAD_MXBEAN_NAME ||
 				obj == MemoryNotificationInfo.MEMORY_COLLECTION_THRESHOLD_EXCEEDED || obj == MemoryNotificationInfo.MEMORY_THRESHOLD_EXCEEDED ||
 				obj == java.rmi.server.LoaderHandler.packagePrefix || obj == java.rmi.server.RemoteRef.packagePrefix ||
+				obj == java.io.File.separator || obj == java.io.File.pathSeparator ||
 				obj == java.util.jar.JarFile.MANIFEST_NAME ||
 				obj == Pack200.Packer.CLASS_ATTRIBUTE_PFX || obj == Pack200.Packer.CODE_ATTRIBUTE_PFX || obj == Pack200.Packer.DEFLATE_HINT || obj == Pack200.Packer.EFFORT || obj == Pack200.Packer.ERROR || obj == Pack200.Packer.FALSE || obj == Pack200.Packer.FIELD_ATTRIBUTE_PFX || obj == Pack200.Packer.KEEP || obj == Pack200.Packer.KEEP_FILE_ORDER || obj == Pack200.Packer.LATEST || obj == Pack200.Packer.METHOD_ATTRIBUTE_PFX || obj == Pack200.Packer.MODIFICATION_TIME || obj == Pack200.Packer.PASS || obj == Pack200.Packer.PASS_FILE_PFX || obj == Pack200.Packer.PROGRESS || obj == Pack200.Packer.SEGMENT_LIMIT || obj == Pack200.Packer.STRIP || obj == Pack200.Packer.TRUE || obj == Pack200.Packer.UNKNOWN_ATTRIBUTE ||
 				obj == Pack200.Unpacker.DEFLATE_HINT || obj == Pack200.Unpacker.FALSE || obj == Pack200.Unpacker.KEEP || obj == Pack200.Unpacker.PROGRESS || obj == Pack200.Unpacker.TRUE ||
-				/*obj == java.util.logging.Logger.GLOBAL_LOGGER_NAME || Java 6*/ obj == java.util.logging.LogManager .LOGGING_MXBEAN_NAME ||
+				/*obj == java.util.logging.Logger.GLOBAL_LOGGER_NAME || Java 6*/ obj == java.util.logging.LogManager.LOGGING_MXBEAN_NAME ||
 				obj == AccessibleContext.ACCESSIBLE_ACTION_PROPERTY || obj == AccessibleContext.ACCESSIBLE_ACTIVE_DESCENDANT_PROPERTY || obj == AccessibleContext.ACCESSIBLE_CARET_PROPERTY || obj == AccessibleContext.ACCESSIBLE_CHILD_PROPERTY || obj == AccessibleContext.ACCESSIBLE_COMPONENT_BOUNDS_CHANGED || obj == AccessibleContext.ACCESSIBLE_DESCRIPTION_PROPERTY || obj == AccessibleContext.ACCESSIBLE_HYPERTEXT_OFFSET || obj == AccessibleContext.ACCESSIBLE_INVALIDATE_CHILDREN || obj == AccessibleContext.ACCESSIBLE_NAME_PROPERTY || obj == AccessibleContext.ACCESSIBLE_SELECTION_PROPERTY || obj == AccessibleContext.ACCESSIBLE_STATE_PROPERTY || obj == AccessibleContext.ACCESSIBLE_TABLE_CAPTION_CHANGED || obj == AccessibleContext.ACCESSIBLE_TABLE_COLUMN_DESCRIPTION_CHANGED || obj == AccessibleContext.ACCESSIBLE_TABLE_COLUMN_HEADER_CHANGED || obj == AccessibleContext.ACCESSIBLE_TABLE_MODEL_CHANGED || obj == AccessibleContext.ACCESSIBLE_TABLE_ROW_DESCRIPTION_CHANGED || obj == AccessibleContext.ACCESSIBLE_TABLE_ROW_HEADER_CHANGED || obj == AccessibleContext.ACCESSIBLE_TABLE_SUMMARY_CHANGED || obj == AccessibleContext.ACCESSIBLE_TEXT_ATTRIBUTES_CHANGED || obj == AccessibleContext.ACCESSIBLE_TEXT_PROPERTY || obj == AccessibleContext.ACCESSIBLE_VALUE_PROPERTY || obj == AccessibleContext.ACCESSIBLE_VISIBLE_DATA_PROPERTY ||
 				obj == AccessibleRelation.CHILD_NODE_OF || obj == AccessibleRelation.CHILD_NODE_OF_PROPERTY || obj == AccessibleRelation.CONTROLLED_BY || obj == AccessibleRelation.CONTROLLED_BY_PROPERTY || obj == AccessibleRelation.CONTROLLER_FOR || obj == AccessibleRelation.CONTROLLER_FOR_PROPERTY || obj == AccessibleRelation.EMBEDDED_BY || obj == AccessibleRelation.EMBEDDED_BY_PROPERTY || obj == AccessibleRelation.EMBEDS || obj == AccessibleRelation.EMBEDS_PROPERTY || obj == AccessibleRelation.FLOWS_FROM || obj == AccessibleRelation.FLOWS_FROM_PROPERTY || obj == AccessibleRelation.FLOWS_TO || obj == AccessibleRelation.FLOWS_TO_PROPERTY || obj == AccessibleRelation.LABEL_FOR || obj == AccessibleRelation.LABEL_FOR_PROPERTY || obj == AccessibleRelation.LABELED_BY || obj == AccessibleRelation.LABELED_BY_PROPERTY || obj == AccessibleRelation.MEMBER_OF || obj == AccessibleRelation.MEMBER_OF_PROPERTY || obj == AccessibleRelation.PARENT_WINDOW_OF || obj == AccessibleRelation.PARENT_WINDOW_OF_PROPERTY || obj == AccessibleRelation.SUBWINDOW_OF || obj == AccessibleRelation.SUBWINDOW_OF_PROPERTY ||
 				obj == javax.imageio.metadata.IIOMetadataFormatImpl.standardMetadataFormatName || obj == javax.management.AttributeChangeNotification.ATTRIBUTE_CHANGE ||
@@ -583,6 +586,75 @@ public abstract class ObjectProfiler {
 				obj == javax.xml.xpath.XPathConstants.DOM_OBJECT_MODEL || obj == javax.xml.xpath.XPathFactory.DEFAULT_OBJECT_MODEL_URI || obj == javax.xml.xpath.XPathFactory.DEFAULT_PROPERTY_NAME ||
 				obj == org.w3c.dom.bootstrap.DOMImplementationRegistry.PROPERTY ||
 				obj == org.xml.sax.helpers.NamespaceSupport.NSDECL || obj == org.xml.sax.helpers.NamespaceSupport.XMLNS) {
+			return true;
+		}
+		if (obj == java.awt.AlphaComposite.Clear
+				|| obj == java.awt.AlphaComposite.Src
+				|| obj == java.awt.AlphaComposite.Dst
+				|| obj == java.awt.AlphaComposite.SrcOver
+				|| obj == java.awt.AlphaComposite.DstOver
+				|| obj == java.awt.AlphaComposite.SrcIn
+				|| obj == java.awt.AlphaComposite.DstIn
+				|| obj == java.awt.AlphaComposite.SrcOut
+				|| obj == java.awt.AlphaComposite.DstOut
+				|| obj == java.awt.AlphaComposite.SrcAtop
+				|| obj == java.awt.AlphaComposite.DstAtop
+				|| obj == java.awt.AlphaComposite.Xor) {
+			return true;
+		}
+		if (obj == java.awt.Color.WHITE
+				|| obj == java.awt.Color.LIGHT_GRAY || obj == java.awt.Color.GRAY || obj == java.awt.Color.DARK_GRAY
+				|| obj == java.awt.Color.BLACK || obj == java.awt.Color.RED
+				|| obj == java.awt.Color.PINK || obj == java.awt.Color.ORANGE
+				|| obj == java.awt.Color.YELLOW || obj == java.awt.Color.GREEN
+				|| obj == java.awt.Color.MAGENTA || obj == java.awt.Color.CYAN
+				|| obj == java.awt.Color.BLUE) {
+			return true;
+		}
+		if (obj == java.io.FileDescriptor.in || obj == java.io.FileDescriptor.out || obj == java.io.FileDescriptor.err || obj == java.io.ObjectStreamClass.NO_FIELDS) {
+			return true;
+		}
+		if (obj == java.security.spec.ECPoint.POINT_INFINITY
+				|| obj == java.security.spec.MGF1ParameterSpec.SHA1 || obj == java.security.spec.MGF1ParameterSpec.SHA256 || obj == java.security.spec.MGF1ParameterSpec.SHA384 || obj == java.security.spec.MGF1ParameterSpec.SHA512
+				|| obj == java.security.spec.PSSParameterSpec.DEFAULT) {
+			return true;
+		}
+		if (obj == java.text.AttributedCharacterIterator.Attribute.LANGUAGE || obj == java.text.AttributedCharacterIterator.Attribute.READING || obj == java.text.AttributedCharacterIterator.Attribute.INPUT_METHOD_SEGMENT) {
+			return true;
+		}
+		if (obj == java.util.jar.Attributes.Name.MANIFEST_VERSION || obj == java.util.jar.Attributes.Name.SIGNATURE_VERSION || obj == java.util.jar.Attributes.Name.CONTENT_TYPE || obj == java.util.jar.Attributes.Name.CLASS_PATH || obj == java.util.jar.Attributes.Name.MAIN_CLASS || obj == java.util.jar.Attributes.Name.SEALED || obj == java.util.jar.Attributes.Name.EXTENSION_LIST || obj == java.util.jar.Attributes.Name.EXTENSION_NAME || obj == java.util.jar.Attributes.Name.EXTENSION_INSTALLATION || obj == java.util.jar.Attributes.Name.IMPLEMENTATION_TITLE || obj == java.util.jar.Attributes.Name.IMPLEMENTATION_VERSION || obj == java.util.jar.Attributes.Name.IMPLEMENTATION_VENDOR || obj == java.util.jar.Attributes.Name.IMPLEMENTATION_VENDOR_ID || obj == java.util.jar.Attributes.Name.IMPLEMENTATION_URL || obj == java.util.jar.Attributes.Name.SPECIFICATION_TITLE || obj == java.util.jar.Attributes.Name.SPECIFICATION_VERSION || obj == java.util.jar.Attributes.Name.SPECIFICATION_VENDOR) {
+			return true;
+		}
+		if (obj == AccessibleRole.ALERT || obj == AccessibleRole.COLUMN_HEADER || obj == AccessibleRole.CANVAS || obj == AccessibleRole.COMBO_BOX || obj == AccessibleRole.DESKTOP_ICON /*|| obj == AccessibleRole.HTML_CONTAINER */|| obj == AccessibleRole.INTERNAL_FRAME || obj == AccessibleRole.DESKTOP_PANE || obj == AccessibleRole.OPTION_PANE || obj == AccessibleRole.WINDOW || obj == AccessibleRole.FRAME || obj == AccessibleRole.DIALOG || obj == AccessibleRole.COLOR_CHOOSER || obj == AccessibleRole.DIRECTORY_PANE || obj == AccessibleRole.FILE_CHOOSER || obj == AccessibleRole.FILLER || obj == AccessibleRole.HYPERLINK || obj == AccessibleRole.ICON || obj == AccessibleRole.LABEL || obj == AccessibleRole.ROOT_PANE || obj == AccessibleRole.GLASS_PANE || obj == AccessibleRole.LAYERED_PANE || obj == AccessibleRole.LIST || obj == AccessibleRole.LIST_ITEM || obj == AccessibleRole.MENU_BAR || obj == AccessibleRole.POPUP_MENU || obj == AccessibleRole.MENU || obj == AccessibleRole.MENU_ITEM || obj == AccessibleRole.SEPARATOR || obj == AccessibleRole.PAGE_TAB_LIST || obj == AccessibleRole.PAGE_TAB || obj == AccessibleRole.PANEL || obj == AccessibleRole.PROGRESS_BAR || obj == AccessibleRole.PASSWORD_TEXT || obj == AccessibleRole.PUSH_BUTTON || obj == AccessibleRole.TOGGLE_BUTTON || obj == AccessibleRole.CHECK_BOX || obj == AccessibleRole.RADIO_BUTTON || obj == AccessibleRole.ROW_HEADER || obj == AccessibleRole.SCROLL_PANE || obj == AccessibleRole.SCROLL_BAR || obj == AccessibleRole.VIEWPORT || obj == AccessibleRole.SLIDER || obj == AccessibleRole.SPLIT_PANE || obj == AccessibleRole.TABLE || obj == AccessibleRole.TEXT || obj == AccessibleRole.TREE || obj == AccessibleRole.TOOL_BAR || obj == AccessibleRole.TOOL_TIP || obj == AccessibleRole.AWT_COMPONENT || obj == AccessibleRole.SWING_COMPONENT || obj == AccessibleRole.UNKNOWN || obj == AccessibleRole.STATUS_BAR || obj == AccessibleRole.DATE_EDITOR || obj == AccessibleRole.SPIN_BOX || obj == AccessibleRole.FONT_CHOOSER || obj == AccessibleRole.GROUP_BOX || obj == AccessibleRole.HEADER || obj == AccessibleRole.FOOTER || obj == AccessibleRole.PARAGRAPH || obj == AccessibleRole.RULER || obj == AccessibleRole.EDITBAR || obj == AccessibleRole.PROGRESS_MONITOR
+				|| obj == AccessibleState.ACTIVE || obj == AccessibleState.PRESSED || obj == AccessibleState.ARMED || obj == AccessibleState.BUSY || obj == AccessibleState.CHECKED || obj == AccessibleState.EDITABLE || obj == AccessibleState.EXPANDABLE || obj == AccessibleState.COLLAPSED || obj == AccessibleState.EXPANDED || obj == AccessibleState.ENABLED || obj == AccessibleState.FOCUSABLE || obj == AccessibleState.FOCUSED || obj == AccessibleState.ICONIFIED || obj == AccessibleState.MODAL || obj == AccessibleState.OPAQUE || obj == AccessibleState.RESIZABLE || obj == AccessibleState.MULTISELECTABLE || obj == AccessibleState.SELECTABLE || obj == AccessibleState.SELECTED || obj == AccessibleState.SHOWING || obj == AccessibleState.VISIBLE || obj == AccessibleState.VERTICAL || obj == AccessibleState.HORIZONTAL || obj == AccessibleState.SINGLE_LINE || obj == AccessibleState.MULTI_LINE || obj == AccessibleState.TRANSIENT || obj == AccessibleState.MANAGES_DESCENDANTS || obj == AccessibleState.INDETERMINATE || obj == AccessibleState.TRUNCATED) {
+			return true;
+		}
+		if (obj == javax.crypto.spec.OAEPParameterSpec.DEFAULT || obj == javax.crypto.spec.PSource.PSpecified.DEFAULT) {
+			return true;
+		}
+		if (obj == javax.imageio.plugins.jpeg.JPEGHuffmanTable.StdDCLuminance || obj == javax.imageio.plugins.jpeg.JPEGHuffmanTable.StdDCChrominance || obj == javax.imageio.plugins.jpeg.JPEGHuffmanTable.StdACLuminance || obj == javax.imageio.plugins.jpeg.JPEGHuffmanTable.StdACChrominance
+				|| obj == javax.imageio.plugins.jpeg.JPEGQTable.K1Luminance || obj == javax.imageio.plugins.jpeg.JPEGQTable.K1Div2Luminance || obj == javax.imageio.plugins.jpeg.JPEGQTable.K2Chrominance || obj == javax.imageio.plugins.jpeg.JPEGQTable.K2Div2Chrominance) {
+			return true;
+		}
+		if (obj == DatatypeConstants.DATETIME || obj == DatatypeConstants.TIME || obj == DatatypeConstants.DATE || obj == DatatypeConstants.GYEARMONTH || obj == DatatypeConstants.GMONTHDAY || obj == DatatypeConstants.GYEAR || obj == DatatypeConstants.GMONTH || obj == DatatypeConstants.GDAY || obj == DatatypeConstants.DURATION || obj == DatatypeConstants.DURATION_DAYTIME || obj == DatatypeConstants.DURATION_YEARMONTH
+				|| obj == javax.xml.xpath.XPathConstants.NUMBER || obj == javax.xml.xpath.XPathConstants.STRING || obj == javax.xml.xpath.XPathConstants.BOOLEAN || obj == javax.xml.xpath.XPathConstants.NODESET || obj == javax.xml.xpath.XPathConstants.NODE || obj == javax.xml.xpath.XPathConstants.DOM_OBJECT_MODEL) {
+			return true;
+		}
+		if (obj == DocFlavor.BYTE_ARRAY.TEXT_PLAIN_HOST || obj == DocFlavor.BYTE_ARRAY.TEXT_PLAIN_UTF_8 || obj == DocFlavor.BYTE_ARRAY.TEXT_PLAIN_UTF_16 || obj == DocFlavor.BYTE_ARRAY.TEXT_PLAIN_UTF_16BE || obj == DocFlavor.BYTE_ARRAY.TEXT_PLAIN_UTF_16LE || obj == DocFlavor.BYTE_ARRAY.TEXT_PLAIN_US_ASCII || obj == DocFlavor.BYTE_ARRAY.TEXT_HTML_HOST || obj == DocFlavor.BYTE_ARRAY.TEXT_HTML_UTF_8 || obj == DocFlavor.BYTE_ARRAY.TEXT_HTML_UTF_16 || obj == DocFlavor.BYTE_ARRAY.TEXT_HTML_UTF_16BE || obj == DocFlavor.BYTE_ARRAY.TEXT_HTML_UTF_16LE || obj == DocFlavor.BYTE_ARRAY.TEXT_HTML_US_ASCII || obj == DocFlavor.BYTE_ARRAY.PDF || obj == DocFlavor.BYTE_ARRAY.POSTSCRIPT || obj == DocFlavor.BYTE_ARRAY.PCL || obj == DocFlavor.BYTE_ARRAY.GIF || obj == DocFlavor.BYTE_ARRAY.JPEG || obj == DocFlavor.BYTE_ARRAY.PNG || obj == DocFlavor.BYTE_ARRAY.AUTOSENSE
+				|| obj == DocFlavor.INPUT_STREAM.TEXT_PLAIN_HOST || obj == DocFlavor.INPUT_STREAM.TEXT_PLAIN_UTF_8 || obj == DocFlavor.INPUT_STREAM.TEXT_PLAIN_UTF_16 || obj == DocFlavor.INPUT_STREAM.TEXT_PLAIN_UTF_16BE || obj == DocFlavor.INPUT_STREAM.TEXT_PLAIN_UTF_16LE || obj == DocFlavor.INPUT_STREAM.TEXT_PLAIN_US_ASCII || obj == DocFlavor.INPUT_STREAM.TEXT_HTML_HOST || obj == DocFlavor.INPUT_STREAM.TEXT_HTML_UTF_8 || obj == DocFlavor.INPUT_STREAM.TEXT_HTML_UTF_16 || obj == DocFlavor.INPUT_STREAM.TEXT_HTML_UTF_16BE || obj == DocFlavor.INPUT_STREAM.TEXT_HTML_UTF_16LE || obj == DocFlavor.INPUT_STREAM.TEXT_HTML_US_ASCII || obj == DocFlavor.INPUT_STREAM.PDF || obj == DocFlavor.INPUT_STREAM.POSTSCRIPT || obj == DocFlavor.INPUT_STREAM.PCL || obj == DocFlavor.INPUT_STREAM.GIF || obj == DocFlavor.INPUT_STREAM.JPEG || obj == DocFlavor.INPUT_STREAM.PNG || obj == DocFlavor.INPUT_STREAM.AUTOSENSE
+				|| obj == DocFlavor.URL.TEXT_PLAIN_HOST || obj == DocFlavor.URL.TEXT_PLAIN_UTF_8 || obj == DocFlavor.URL.TEXT_PLAIN_UTF_16 || obj == DocFlavor.URL.TEXT_PLAIN_UTF_16BE || obj == DocFlavor.URL.TEXT_PLAIN_UTF_16LE || obj == DocFlavor.URL.TEXT_PLAIN_US_ASCII || obj == DocFlavor.URL.TEXT_HTML_HOST || obj == DocFlavor.URL.TEXT_HTML_UTF_8 || obj == DocFlavor.URL.TEXT_HTML_UTF_16 || obj == DocFlavor.URL.TEXT_HTML_UTF_16BE || obj == DocFlavor.URL.TEXT_HTML_UTF_16LE || obj == DocFlavor.URL.TEXT_HTML_US_ASCII || obj == DocFlavor.URL.PDF || obj == DocFlavor.URL.POSTSCRIPT || obj == DocFlavor.URL.PCL || obj == DocFlavor.URL.GIF || obj == DocFlavor.URL.JPEG || obj == DocFlavor.URL.PNG || obj == DocFlavor.URL.AUTOSENSE
+				|| obj == DocFlavor.CHAR_ARRAY.TEXT_PLAIN || obj == DocFlavor.CHAR_ARRAY.TEXT_HTML
+				|| obj == DocFlavor.STRING.TEXT_PLAIN || obj == DocFlavor.STRING.TEXT_HTML
+				|| obj == DocFlavor.READER.TEXT_PLAIN || obj == DocFlavor.READER.TEXT_HTML
+				|| obj == DocFlavor.SERVICE_FORMATTED.RENDERABLE_IMAGE || obj == DocFlavor.SERVICE_FORMATTED.PRINTABLE || obj == DocFlavor.SERVICE_FORMATTED.PAGEABLE) {
+			return true;
+		}
+		if (obj == javax.sound.sampled.AudioFileFormat.Type.WAVE || obj == javax.sound.sampled.AudioFileFormat.Type.AU || obj == javax.sound.sampled.AudioFileFormat.Type.AIFF || obj == javax.sound.sampled.AudioFileFormat.Type.AIFC || obj == javax.sound.sampled.AudioFileFormat.Type.SND
+				|| obj == javax.sound.sampled.BooleanControl.Type.MUTE || obj == javax.sound.sampled.BooleanControl.Type.APPLY_REVERB
+				|| obj == javax.sound.sampled.EnumControl.Type.REVERB
+				|| obj == javax.sound.sampled.FloatControl.Type.MASTER_GAIN || obj == javax.sound.sampled.FloatControl.Type.AUX_SEND || obj == javax.sound.sampled.FloatControl.Type.AUX_RETURN || obj == javax.sound.sampled.FloatControl.Type.REVERB_SEND || obj == javax.sound.sampled.FloatControl.Type.REVERB_RETURN || obj == javax.sound.sampled.FloatControl.Type.VOLUME || obj == javax.sound.sampled.FloatControl.Type.PAN || obj == javax.sound.sampled.FloatControl.Type.BALANCE || obj == javax.sound.sampled.FloatControl.Type.SAMPLE_RATE
+				|| obj == javax.sound.sampled.LineEvent.Type.OPEN || obj == javax.sound.sampled.LineEvent.Type.CLOSE || obj == javax.sound.sampled.LineEvent.Type.START || obj == javax.sound.sampled.LineEvent.Type.STOP
+				|| obj == javax.sound.sampled.Port.Info.MICROPHONE || obj == javax.sound.sampled.Port.Info.LINE_IN || obj == javax.sound.sampled.Port.Info.COMPACT_DISC || obj == javax.sound.sampled.Port.Info.SPEAKER || obj == javax.sound.sampled.Port.Info.HEADPHONE || obj == javax.sound.sampled.Port.Info.LINE_OUT) {
 			return true;
 		}
 		return false;
