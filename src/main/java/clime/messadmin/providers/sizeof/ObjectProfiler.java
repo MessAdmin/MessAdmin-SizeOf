@@ -629,9 +629,9 @@ public abstract class ObjectProfiler {
 				|| obj == AccessibleState.ACTIVE || obj == AccessibleState.PRESSED || obj == AccessibleState.ARMED || obj == AccessibleState.BUSY || obj == AccessibleState.CHECKED || obj == AccessibleState.EDITABLE || obj == AccessibleState.EXPANDABLE || obj == AccessibleState.COLLAPSED || obj == AccessibleState.EXPANDED || obj == AccessibleState.ENABLED || obj == AccessibleState.FOCUSABLE || obj == AccessibleState.FOCUSED || obj == AccessibleState.ICONIFIED || obj == AccessibleState.MODAL || obj == AccessibleState.OPAQUE || obj == AccessibleState.RESIZABLE || obj == AccessibleState.MULTISELECTABLE || obj == AccessibleState.SELECTABLE || obj == AccessibleState.SELECTED || obj == AccessibleState.SHOWING || obj == AccessibleState.VISIBLE || obj == AccessibleState.VERTICAL || obj == AccessibleState.HORIZONTAL || obj == AccessibleState.SINGLE_LINE || obj == AccessibleState.MULTI_LINE || obj == AccessibleState.TRANSIENT || obj == AccessibleState.MANAGES_DESCENDANTS || obj == AccessibleState.INDETERMINATE || obj == AccessibleState.TRUNCATED) {
 			return true;
 		}
-		if (obj == javax.crypto.spec.OAEPParameterSpec.DEFAULT || obj == javax.crypto.spec.PSource.PSpecified.DEFAULT) {
-			return true;
-		}
+//		if (obj == javax.crypto.spec.OAEPParameterSpec.DEFAULT || obj == javax.crypto.spec.PSource.PSpecified.DEFAULT) {Java 6
+//			return true;
+//		}
 		if (obj == javax.imageio.plugins.jpeg.JPEGHuffmanTable.StdDCLuminance || obj == javax.imageio.plugins.jpeg.JPEGHuffmanTable.StdDCChrominance || obj == javax.imageio.plugins.jpeg.JPEGHuffmanTable.StdACLuminance || obj == javax.imageio.plugins.jpeg.JPEGHuffmanTable.StdACChrominance
 				|| obj == javax.imageio.plugins.jpeg.JPEGQTable.K1Luminance || obj == javax.imageio.plugins.jpeg.JPEGQTable.K1Div2Luminance || obj == javax.imageio.plugins.jpeg.JPEGQTable.K2Chrominance || obj == javax.imageio.plugins.jpeg.JPEGQTable.K2Div2Chrominance) {
 			return true;
